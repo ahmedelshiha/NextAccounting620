@@ -130,7 +130,7 @@ export const GET = withTenantContext(async (request: Request) => {
       if (queryError) throw queryError
 
       // If query succeeded, use the data
-      const { total, users } = queryData as { total: number; users: Array<{ id: string; name: string | null; email: string; role: string; createdAt: Date; updatedAt: Date | null }> }
+      const { total, users } = queryData as { total: number; users: Array<{ id: string; name: string | null; email: string; role: string; department: string | null; tier: string | null; createdAt: Date; updatedAt: Date | null }> }
 
       // Map users to response format
       const mapped = users.map((user) => ({
@@ -138,6 +138,8 @@ export const GET = withTenantContext(async (request: Request) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        department: user.department || undefined,
+        tier: user.tier || undefined,
         createdAt: user.createdAt instanceof Date ? user.createdAt.toISOString() : user.createdAt,
         updatedAt: user.updatedAt ? (user.updatedAt instanceof Date ? user.updatedAt.toISOString() : user.updatedAt) : (user.createdAt instanceof Date ? user.createdAt.toISOString() : user.createdAt)
       }))
