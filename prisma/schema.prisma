@@ -93,6 +93,7 @@ model User {
   bulkOperationsApproved    BulkOperation[]         @relation("BulkOperationApprovedBy")
   bulkOperationResults      BulkOperationResult[]
   bulkOperationHistoryChanges BulkOperationHistory[] @relation("BulkOperationHistoryChangedBy")
+  filterPresetsCreated      FilterPreset[]          @relation("FilterPresetCreatedBy")
 
   @@unique([tenantId, email])
   @@index([tenantId, role])
