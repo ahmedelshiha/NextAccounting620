@@ -147,35 +147,37 @@ export const ClientFormModal = React.forwardRef<HTMLDivElement, ClientFormModalP
               {form.fieldErrors.email && <p className="text-sm text-red-600">{form.fieldErrors.email}</p>}
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone</Label>
+                <Label htmlFor="phone" className="text-xs sm:text-sm">Phone</Label>
                 <Input
                   id="phone"
                   placeholder="Phone number"
                   value={form.formData.phone || ''}
                   onChange={(e) => form.handleChange('phone', e.target.value)}
                   disabled={form.isSubmitting}
+                  className="text-sm"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="company">Company</Label>
+                <Label htmlFor="company" className="text-xs sm:text-sm">Company</Label>
                 <Input
                   id="company"
                   placeholder="Company name"
                   value={form.formData.company || ''}
                   onChange={(e) => form.handleChange('company', e.target.value)}
                   disabled={form.isSubmitting}
+                  className="text-sm"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-2">
-                <Label htmlFor="tier">Tier</Label>
+                <Label htmlFor="tier" className="text-xs sm:text-sm">Tier</Label>
                 <Select value={form.formData.tier} onValueChange={(value) => form.handleChange('tier', value)}>
-                  <SelectTrigger id="tier">
+                  <SelectTrigger id="tier" className="text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -187,9 +189,9 @@ export const ClientFormModal = React.forwardRef<HTMLDivElement, ClientFormModalP
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
+                <Label htmlFor="status" className="text-xs sm:text-sm">Status</Label>
                 <Select value={form.formData.status} onValueChange={(value) => form.handleChange('status', value)}>
-                  <SelectTrigger id="status">
+                  <SelectTrigger id="status" className="text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
