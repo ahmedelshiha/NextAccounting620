@@ -48,15 +48,19 @@ export function EnterpriseUsersPage() {
   // Performance: start render measure (ended in effects below)
   performanceMetrics.startMeasure('admin-users-page:render')
 
-  // Initialize tab from URL query (?tab=...)
+  const context = useUsersContext()
+
+  // Initialize tab from URL query (?tab=...) and apply role filter (?role=...)
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search)
       const tab = params.get('tab') as TabType | null
+      const roleParam = params.get('role') as string | null
       const isRetireEntitiesTabEnabled = isFeatureEnabled('retireEntitiesTab', false)
 
       let tabToSet: TabType = 'dashboard'
       const validTabs: TabType[] = ['dashboard', 'entities', 'workflows', 'bulk-operations', 'audit', 'rbac', 'admin']
+      const validRoles = ['ALL', 'ADMIN', 'TEAM_LEAD', 'TEAM_MEMBER', 'STAFF', 'CLIENT']
 
       if (tab && (validTabs as string[]).includes(tab)) {
         // If Entities tab is requested but feature flag is enabled, redirect to Dashboard
@@ -69,10 +73,14 @@ export function EnterpriseUsersPage() {
         }
       }
 
+      // Apply role filter if provided in URL
+      if (roleParam && validRoles.includes(roleParam) && context.setRoleFilter) {
+        context.setRoleFilter(roleParam as any)
+      }
+
       setActiveTab(tabToSet)
     }
   }, [])
-  const context = useUsersContext()
 
   // End render measure on initial mount and tab/user changes
   useEffect(() => {
