@@ -103,12 +103,18 @@ export function useFilterUsers(
     const {
       searchFields = DEFAULT_CONFIG.searchFields,
       caseInsensitive = DEFAULT_CONFIG.caseInsensitive,
-      sortByDate = DEFAULT_CONFIG.sortByDate
+      sortByDate = DEFAULT_CONFIG.sortByDate,
+      serverSide = DEFAULT_CONFIG.serverSide
     } = config
+
+    // If server-side filtering is enabled, return the query string instead
+    if (serverSide) {
+      return buildServerFilterQuery(filters)
+    }
 
     let result = users
 
-    // Apply search filter
+    // Apply search filter (case-insensitive by default)
     if (filters.search?.trim()) {
       const searchTerm = caseInsensitive ? filters.search.trim().toLowerCase() : filters.search.trim()
 
@@ -128,7 +134,7 @@ export function useFilterUsers(
       result = result.filter((user) => user.role === filters.role)
     }
 
-    // Apply status filter
+    // Apply status/availability filter
     if (filters.status && filters.status !== 'ALL') {
       result = result.filter((user) => (user.status || 'ACTIVE') === filters.status)
     }
@@ -148,13 +154,23 @@ export function useFilterUsers(
       result = result.filter((user) => user.department === filters.department)
     }
 
-    // Sort by creation date if enabled
-    if (sortByDate) {
+    // Sort by specified field or creation date
+    if (filters.sortBy && filters.sortBy !== 'createdAt') {
+      result = result.sort((a, b) => {
+        const aVal = (a as any)[filters.sortBy!]
+        const bVal = (b as any)[filters.sortBy!]
+
+        if (aVal === bVal) return 0
+
+        const comparison = aVal < bVal ? -1 : 1
+        return filters.sortOrder === 'asc' ? comparison : -comparison
+      })
+    } else if (sortByDate) {
       result = result.sort(
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       )
     }
 
     return result
-  }, [users, filters, config.searchFields, config.caseInsensitive, config.sortByDate])
+  }, [users, filters, config.searchFields, config.caseInsensitive, config.sortByDate, config.serverSide])
 }
