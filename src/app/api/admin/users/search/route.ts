@@ -182,7 +182,6 @@ export const GET = withTenantContext(async (request: NextRequest) => {
           name: true,
           email: true,
           role: true,
-          status: true,
           availabilityStatus: true,
           department: true,
           position: true,
