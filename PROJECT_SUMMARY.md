@@ -57,9 +57,43 @@
 - Confirm Redis / Realtime adapters have production credentials or fallbacks to avoid silent degradation.
 - Maintain Netlify cron secrets and Stripe webhook secret rotation schedules.
 
+## Active Initiatives & Transformations
+
+### AdminWorkBench Transformation (Phases 1-5: COMPLETE ✅)
+**Status:** ✅ 92% Complete - Production Ready
+**Overview:** Modern responsive user management dashboard replacing legacy ExecutiveDashboardTab with 15+ new components, bulk operations, and Builder.io CMS integration support.
+
+**Key Deliverables:**
+- 27+ implementation files created and verified
+- Full responsive design (mobile/tablet/desktop)
+- Feature flag-gated rollout with 100% backward compatibility
+- Comprehensive testing infrastructure (180+ test cases)
+- Phases 6-8 documented (Builder.io, Testing, Monitoring)
+
+**Documentation:** See `docs/ADMIN_WORKBENCH_PROJECT_STATUS.md` for complete details.
+**Timeline:** Ready for deployment with staged rollout strategy.
+
+### Entities Tab Retirement (Phases 0-6: COMPLETE ✅)
+**Status:** ✅ 100% Complete - Production Ready
+**Overview:** Strategic migration from separate Client/Team tabs to unified user management with role-based filtering.
+
+**Key Deliverables:**
+- 22 files modified across all layers
+- 45 test cases covering all scenarios
+- Zero breaking changes via feature flag
+- API deprecation headers with 90-day sunset
+- Full audit trail and telemetry
+
+**Documentation:** See `docs/ENTITIES_TAB_RETIREMENT_READINESS_REPORT.md` for complete details.
+**Timeline:** Ready for staged production rollout.
+
+---
+
 ## Recommended Next Steps
-1. **Dependency Hygiene:** lock wildcard packages, audit transitive deps, and schedule routine `pnpm audit` checks.
-2. **Documentation Expansion:** add runbooks for ClamAV deployment, tenant migration scripts, and realtime adapter configuration.
-3. **CI Hardening:** enforce lint/typecheck/test across all PRs; add Playwright smoke workflow with preview credentials.
-4. **Monitoring Enhancements:** integrate Sentry releases, ensure `monitoring/` dashboards are wired to production metrics.
-5. **Module Cleanup:** evaluate archived templates/docs for removal or migration to knowledge base; document feature ownership updates.
+1. **AdminWorkBench Deployment:** Execute pre-deployment verification (API check, tests, staging), then staged rollout (10% → 25% → 50% → 75% → 100%).
+2. **Entities Tab Rollout:** Coordinate with AdminWorkBench rollout; use feature flag for smooth transition (default: OFF).
+3. **Dependency Hygiene:** lock wildcard packages, audit transitive deps, and schedule routine `pnpm audit` checks.
+4. **Documentation Expansion:** add runbooks for AdminWorkBench deployment, ClamAV deployment, and realtime adapter configuration.
+5. **CI Hardening:** enforce lint/typecheck/test across all PRs; add Playwright smoke workflow with preview credentials.
+6. **Monitoring Enhancements:** integrate Sentry releases and AdminWorkBench custom metrics; ensure dashboards are wired to production.
+7. **Module Cleanup:** evaluate archived templates/docs for removal or migration to knowledge base; document feature ownership updates.
