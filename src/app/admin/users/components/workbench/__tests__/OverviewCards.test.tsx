@@ -52,19 +52,19 @@ describe('OverviewCards', () => {
 
   describe('Loading State', () => {
     it('should show skeleton while loading', () => {
-      mockUseUsersContext.mockReturnValue({
+      contextValue = {
         users: [],
         isLoading: true,
         error: null
-      })
+      }
 
-      render(<OverviewCards />)
+      renderWithProvider(<OverviewCards />)
 
       expect(screen.getByTestId('skeleton')).toBeInTheDocument()
     })
 
     it('should show metrics when loaded', async () => {
-      mockUseUsersContext.mockReturnValue({
+      contextValue = {
         users: [
           { id: '1', status: 'ACTIVE' },
           { id: '2', status: 'INACTIVE' },
@@ -72,9 +72,9 @@ describe('OverviewCards', () => {
         ],
         isLoading: false,
         error: null
-      })
+      }
 
-      render(<OverviewCards />)
+      renderWithProvider(<OverviewCards />)
 
       await waitFor(() => {
         expect(screen.getByTestId('operations-overview-cards')).toBeInTheDocument()
