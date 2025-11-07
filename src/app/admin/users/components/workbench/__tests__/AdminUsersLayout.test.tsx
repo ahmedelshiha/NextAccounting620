@@ -39,19 +39,20 @@ describe('AdminUsersLayout', () => {
   describe('Rendering', () => {
     it('should render header with quick actions', () => {
       renderWithContext(<AdminUsersLayout />)
-      const header = screen.getByRole('banner') || screen.getByText(/Add User|Import|Bulk|Export/)
+      const header = screen.getByTestId('admin-workbench-header')
       expect(header).toBeInTheDocument()
+      expect(header).toHaveAttribute('role', 'banner')
     })
 
     it('should render main content area', () => {
       renderWithContext(<AdminUsersLayout />)
-      const main = screen.getByRole('main')
+      const main = screen.getByTestId('admin-main-content')
       expect(main).toBeInTheDocument()
     })
 
     it('should render sidebar', () => {
       renderWithContext(<AdminUsersLayout />)
-      const aside = screen.getByRole('complementary')
+      const aside = screen.getByTestId('admin-sidebar')
       expect(aside).toBeInTheDocument()
     })
 
