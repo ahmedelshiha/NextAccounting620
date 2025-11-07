@@ -60,7 +60,7 @@ export function BuilderHeaderSlot() {
   }
 
   return (
-    <div data-builder-model={BUILDER_MODELS.ADMIN_WORKBENCH_HEADER}>
+    <div data-builder-model={BUILDER_MODELS.ADMIN_WORKBENCH_HEADER} data-testid="builder-header-slot">
       {content.blocks ? renderBuilderBlocks(content.blocks) : <QuickActionsBar />}
     </div>
   )
@@ -94,7 +94,7 @@ export function BuilderMetricsSlot() {
   }
 
   return (
-    <div data-builder-model={BUILDER_MODELS.ADMIN_WORKBENCH_METRICS}>
+    <div data-builder-model={BUILDER_MODELS.ADMIN_WORKBENCH_METRICS} data-testid="builder-metrics-slot">
       {content.blocks ? renderBuilderBlocks(content.blocks) : <OverviewCards />}
     </div>
   )
@@ -128,7 +128,7 @@ export function BuilderSidebarSlot(props: Parameters<typeof AdminSidebar>[0]) {
   }
 
   return (
-    <div data-builder-model={BUILDER_MODELS.ADMIN_WORKBENCH_SIDEBAR}>
+    <div data-builder-model={BUILDER_MODELS.ADMIN_WORKBENCH_SIDEBAR} data-testid="builder-sidebar-slot">
       {content.blocks ? renderBuilderBlocks(content.blocks) : <AdminSidebar {...props} />}
     </div>
   )
@@ -162,7 +162,7 @@ export function BuilderFooterSlot(props: Parameters<typeof BulkActionsPanel>[0])
   }
 
   return (
-    <div data-builder-model={BUILDER_MODELS.ADMIN_WORKBENCH_FOOTER}>
+    <div data-builder-model={BUILDER_MODELS.ADMIN_WORKBENCH_FOOTER} data-testid="builder-footer-slot">
       {content.blocks ? renderBuilderBlocks(content.blocks) : <BulkActionsPanel {...props} />}
     </div>
   )
