@@ -21,7 +21,7 @@ import '../styles/admin-users-layout.css'
  * Layout structure:
  * ┌─────────────────────────────────────────────┐
  * │        Sticky Header: QuickActionsBar        │
- * ├──────────────┬─────────────────��───────���──┤
+ * ├──────────────┬─────────────────��───────������─┤
  * │              │                            │
  * │   Sidebar    │     Main Content Area      │
  * │  (Analytics  │   ┌──────────────────��    │
@@ -157,6 +157,7 @@ export default function AdminUsersLayout() {
             onImport={handleImport}
             onExport={handleExport}
             onRefresh={handleRefresh}
+            isRefreshing={isRefreshing}
           />
         )}
       </header>
