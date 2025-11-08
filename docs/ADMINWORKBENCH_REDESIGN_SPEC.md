@@ -158,7 +158,7 @@ This document provides:
 │  Role:   [All ▼]                │                              │
 │  Status: [All ▼]                │                              │
 │                                  │                              │
-├──────────────────────────────────┴──────────────────────────────┤
+├─────────────────────────���────────┴──────────────────────────────┤
 │ Status: [Active ▼]     [Apply Changes]   [3 users selected]     │ ← Bulk Ops Footer
 └──────────────────────────────────────────────────────────────────┘
 ```
@@ -476,7 +476,7 @@ This document provides:
 
 **Current State (Deployed):**
 ```
-┌───────────────────────────────────────────────────────����─┐
+┌───────────────────────────────────────────────────────���─┐
 │  Dashboard  Workflows  Bulk Ops  Audit Log  RBAC  Admin │ ← Dark tabs
 ├─────────────────────────────────────────────────────────┤
 │                                                         │
@@ -491,7 +491,7 @@ This document provides:
 │                                                         │
 ├────���────────────────────────────────────────────────────┤
 │ [Total Users: 6] [Pending: 0] [In Progress: 6] [Due: 0] │ ← 4 cards, dark bg
-├──────────────────────────────────────────────────��──────┤
+├───���──────────────────────────────────────────────��──────┤
 │ User Directory (minimal rows shown)                      │
 │ ┌─────────────────────────────────────────────────────┐ │
 │ │ Name         | Email         | Role   | Status | ... │ │
@@ -517,7 +517,7 @@ This document provides:
 │ Filters              │ User Directory                            │
 │ ────────────────────│ ┌─────────────────────────────────────┐  │
 │ Role: All ▼          │ │ Name  │ Email  │ Role  │ Status│...│  │
-│ Status: All ▼        │ │ Jane  │ jane@  │ Admin │Active │...│  ��
+│ Status: All ▼        │ │ Jane  │ jane@  │ Admin │Active │...│  │
 │                      │ │ John  │ john@  │ Edit. │Inact │...│  │
 │ [Clear]              │ │ Ahmed │ ahmed@ │ View. │Active │...│  │
 │                      │ │ Emily │ emily@ │ Edit. │Active │...│  │
@@ -548,7 +548,7 @@ This document provides:
 | **Export Button** | In sidebar dropdown | ✅ White outline | ⚠️ Location change | Move to header |
 | **Refresh Button** | Missing | ✅ Ghost icon button | ❌ Missing | Add new button |
 | **Audit Trail Button** | Gear icon in sidebar | ✅ Settings icon | ⚠️ Location change | Move to header |
-| **Shadow** | Subtle (shadow-sm) | Medium shadow visible | ⚠️ Elevation | Increase shadow depth |
+| **Shadow** | Subtle (shadow-sm) | Medium shadow visible | ���️ Elevation | Increase shadow depth |
 
 **Color Scheme:**
 - Header: `bg-blue-600` (or `#1F55D4`)
@@ -1980,12 +1980,30 @@ This section documents the User Directory table features analyzed from the targe
      - Effect scope: Full row including all 6 columns (checkbox, name, email, role, status, actions)
 
 4. **Verify Status Badges**
-   - [ ] Active badge: Green background (#dcfce7), green text (#166534), green border (#bbf7d0)
-   - [ ] Inactive badge: Red background (#fee2e2), red text (#991b1b), red border (#fecaca)
-   - [ ] Badge padding: 4px 8px
-   - [ ] Badge border radius: 4px
-   - [ ] Font size: 12px, font weight: 500
+   - [x] Active badge: Green background (#dcfce7), green text (#166534), green border (#059669)
+   - [x] Inactive badge: Red background (#fee2e2), red text (#991b1b), red border (#dc2626)
+   - [x] Badge padding: 4px 8px
+   - [x] Badge border radius: 4px
+   - [x] Font size: 12px, font weight: 500
    - **File:** `src/app/admin/users/components/UserRow.tsx`
+   - **Status:** ✅ COMPLETED - Updated border colors to match target
+   - **Implementation Details:**
+     - Active badge classes: `bg-green-100 text-green-800 border border-green-600`
+     - Inactive badge classes: `bg-red-100 text-red-800 border border-red-600`
+     - Suspended badge: Same as inactive (red)
+     - Pending badge: `bg-yellow-100 text-yellow-800 border border-yellow-600`
+     - Badge styling: `inline-flex items-center px-2 py-1 text-xs font-medium rounded`
+     - Padding: 4px 8px (px-2 py-1 in Tailwind)
+     - Font size: 12px (text-xs in Tailwind)
+     - Font weight: 500 (medium, from getRoleColor pattern)
+     - Border radius: rounded (4px in Tailwind)
+   - **Color Mapping:**
+     - Green-100 = #dcfce7 (light green background) ✅
+     - Green-800 = #166534 (dark green text) ✅
+     - Green-600 = #16a34a (darker green border) ✅
+     - Red-100 = #fee2e2 (light red background) ✅
+     - Red-800 = #991b1b (dark red text) ✅
+     - Red-600 = #dc2626 (darker red border) ✅
 
 5. **Verify Role Badges**
    - [ ] Admin: Red background (#fca5a5) with red text (#991b1b)
