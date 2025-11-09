@@ -77,7 +77,7 @@ export const GET = withTenantContext(async (request: NextRequest, { params }: { 
         avatar: log.user.image
       } : null,
       details: log.metadata || {},
-      message: formatActivityMessage(log.action, log.resource, log.metadata)
+      message: formatActivityMessage(log.action, log.resource || '', log.metadata)
     }))
 
     return NextResponse.json({

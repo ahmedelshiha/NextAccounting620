@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { withTenantContext } from '@/lib/api-wrapper'
 import { requireTenantContext } from '@/lib/tenant-utils'
 import prisma from '@/lib/prisma'
@@ -7,6 +7,8 @@ import { hasPermission, PERMISSIONS } from '@/lib/permissions'
 import { createHash } from 'crypto'
 import { applyRateLimit, getClientIp } from '@/lib/rate-limit'
 import { tenantFilter } from '@/lib/tenant'
+import { AuditLogService } from '@/services/audit-log.service'
+import { UserCreateSchema } from '@/schemas/users'
 
 export const runtime = 'nodejs'
 export const revalidate = 30 // ISR: Revalidate every 30 seconds
@@ -235,5 +237,130 @@ export const GET = withTenantContext(async (request: Request) => {
       users: fallback,
       pagination: { page: 1, limit: 50, total: 3, pages: 1 }
     }, { status: 200 })
+  }
+})
+
+/**
+ * POST /api/admin/users
+ * Create a new user in the organization
+ * Requires: USERS_MANAGE permission
+ */
+export const POST = withTenantContext(async (request: NextRequest) => {
+  const ctx = requireTenantContext()
+  const tenantId = ctx.tenantId ?? null
+
+  try {
+    const role = ctx.role ?? ''
+    if (!ctx.userId) return respond.unauthorized()
+    if (!hasPermission(role, PERMISSIONS.USERS_MANAGE)) return respond.forbidden('Forbidden')
+
+    const hasDb = Boolean(process.env.NETLIFY_DATABASE_URL)
+    if (!hasDb) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 501 })
+    }
+
+    const ip = getClientIp(request as unknown as Request)
+    const rl = await applyRateLimit(`admin-create-user:${ip}`, 50, 60_000)
+    if (rl && rl.allowed === false) {
+      try {
+        const { logAudit } = await import('@/lib/audit')
+        await logAudit({
+          action: 'security.ratelimit.block',
+          details: { tenantId, ip, key: `admin-create-user:${ip}`, route: '/api/admin/users' }
+        })
+      } catch {}
+      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 })
+    }
+
+    const json = await request.json().catch(() => ({}))
+
+    // Validate request payload
+    const parsed = UserCreateSchema.safeParse(json)
+    if (!parsed.success) {
+      const errors = parsed.error.flatten().fieldErrors
+      const message = Object.entries(errors)
+        .map(([field, msgs]) => `${field}: ${msgs?.[0] || 'invalid'}`)
+        .join('; ')
+      return NextResponse.json({ error: message }, { status: 400 })
+    }
+
+    const { name, email, role: userRole = 'USER', requiresOnboarding = true, phone, company, location, notes } = parsed.data
+
+    // Check if user already exists using tenant-scoped compound key
+    const existingUser = tenantId
+      ? await prisma.user.findFirst({
+          where: { tenantId, email },
+          select: { id: true }
+        })
+      : null
+
+    if (existingUser) {
+      return NextResponse.json({ error: 'User with this email already exists' }, { status: 409 })
+    }
+
+    // Create new user
+    const newUser = await prisma.user.create({
+      data: {
+        name,
+        email,
+        role: userRole as any,
+        availabilityStatus: 'AVAILABLE',
+        tenantId: tenantId || 'default-tenant',
+        ...(phone && { phone }),
+        ...(company && { department: company }),
+        ...(location && { position: location }),
+        ...(notes && { image: notes })
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true
+      }
+    })
+
+    // Log audit event
+    try {
+      if (tenantId) {
+        await AuditLogService.createAuditLog({
+          tenantId,
+          userId: ctx.userId,
+          action: 'user.create',
+          resource: `user:${newUser.id}`,
+          metadata: {
+            targetUserId: newUser.id,
+            targetEmail: newUser.email,
+            targetName: newUser.name,
+            targetRole: newUser.role,
+            timestamp: new Date().toISOString()
+          },
+          ipAddress: ip,
+          userAgent: request.headers.get('user-agent') || undefined
+        })
+      }
+    } catch (auditErr) {
+      console.error('Failed to log user creation audit event:', auditErr)
+      // Don't fail the request if audit logging fails
+    }
+
+    return NextResponse.json(newUser, { status: 201 })
+  } catch (error: any) {
+    console.error('Error creating user:', error)
+
+    // Handle unique constraint violations
+    if (error?.code === 'P2002') {
+      const field = error.meta?.target?.[0] || 'email'
+      return NextResponse.json(
+        { error: `User with this ${field} already exists` },
+        { status: 409 }
+      )
+    }
+
+    return NextResponse.json(
+      { error: error?.message || 'Failed to create user' },
+      { status: 500 }
+    )
   }
 })

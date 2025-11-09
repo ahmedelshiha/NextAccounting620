@@ -10,6 +10,7 @@ import { SettingsTab } from '../UserProfileDialog/SettingsTab'
 import { useUserActions } from '../../hooks/useUserActions'
 import { toast } from 'sonner'
 import UnifiedPermissionModal from '@/components/admin/permissions/UnifiedPermissionModal'
+import type { Permission } from '@/lib/permissions'
 
 export default function InlineUserProfile({ onBack }: { onBack: () => void }) {
   const {
@@ -180,7 +181,7 @@ export default function InlineUserProfile({ onBack }: { onBack: () => void }) {
           targetName={selectedUser.name || 'User'}
           targetEmail={selectedUser.email}
           currentRole={selectedUser.role}
-          currentPermissions={selectedUser.permissions || []}
+          currentPermissions={(selectedUser.permissions || []) as Permission[]}
           onClose={() => setPermissionModalOpen(false)}
           onSave={async (changes) => {
             try {
