@@ -133,9 +133,9 @@ export function useFilteredUsers(
   }, [useCache, filters, cacheTtl])
 
   // Use SWR for data fetching
-  const { data, error, isLoading, mutate } = useSWR<FilteredUsersResponse>(
+  const { data, error, isLoading, mutate } = useSWR<FilteredUsersResponse | undefined>(
     enabled ? cacheKey : null,
-    fetcher,
+    enabled ? fetcher : null,
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: true,
