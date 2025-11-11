@@ -91,7 +91,7 @@ export default function AdminSidebar({
     <div className="admin-sidebar-wrapper" data-collapsed={isCollapsed}>
       {/* Header with collapse/close buttons */}
       <div className="admin-sidebar-header">
-        <h3 className={`text-lg font-semibold text-gray-900 admin-sidebar-title ${isCollapsed ? 'hidden' : ''}`}>
+        <h3 className="admin-sidebar-title">
           Analytics
         </h3>
         <div className="admin-sidebar-header-actions">
@@ -119,14 +119,14 @@ export default function AdminSidebar({
       </div>
 
       {/* Sidebar content */}
-      <div className={`admin-sidebar-content ${isCollapsed ? 'hidden' : ''}`}>
+      <div className="admin-sidebar-content">
         {/* Analytics Section */}
         <Collapsible open={expandedSections.analytics}>
           <CollapsibleTrigger
             onClick={() => toggleSection('analytics')}
             className="admin-sidebar-trigger"
           >
-            <h3 className="text-sm font-semibold text-gray-900">Analytics</h3>
+            <h3 className="admin-sidebar-section-title">Analytics</h3>
             <svg
               className={`admin-sidebar-trigger-icon ${expandedSections.analytics ? 'rotate-180' : ''}`}
               fill="none"
@@ -144,14 +144,14 @@ export default function AdminSidebar({
           </CollapsibleTrigger>
 
           <CollapsibleContent className="admin-sidebar-content-inner">
-            <div className="space-y-4">
-              <div className="bg-white rounded border border-gray-100 p-3">
+            <div className="admin-sidebar-charts-container">
+              <div className="admin-sidebar-chart">
                 <RoleDistributionChart
                   data={roleDistributionData}
                   loading={context.isLoading}
                 />
               </div>
-              <div className="bg-white rounded border border-gray-100 p-3">
+              <div className="admin-sidebar-chart">
                 <UserGrowthChart
                   data={userGrowthData}
                   loading={context.isLoading}
@@ -167,7 +167,7 @@ export default function AdminSidebar({
             onClick={() => toggleSection('activity')}
             className="admin-sidebar-trigger"
           >
-            <h3 className="text-sm font-semibold text-gray-900">Recent Activity</h3>
+            <h3 className="admin-sidebar-section-title">Recent Activity</h3>
             <svg
               className={`admin-sidebar-trigger-icon ${expandedSections.activity ? 'rotate-180' : ''}`}
               fill="none"
@@ -185,7 +185,7 @@ export default function AdminSidebar({
           </CollapsibleTrigger>
 
           <CollapsibleContent className="admin-sidebar-content-inner">
-            <div className="bg-white rounded border border-gray-100">
+            <div className="admin-sidebar-activity">
               <RecentActivityFeed
                 limit={5}
                 showViewAll={true}
@@ -201,13 +201,16 @@ export default function AdminSidebar({
           display: flex;
           flex-direction: column;
           height: 100%;
+          width: 100%;
           padding: 1rem;
           gap: 0.5rem;
-          transition: padding 0.3s ease;
+          transition: all 300ms ease-in-out;
+          overflow: hidden;
         }
 
         .admin-sidebar-wrapper[data-collapsed="true"] {
           padding: 0.75rem 0.5rem;
+          opacity: 0.95;
         }
 
         .admin-sidebar-header {
@@ -217,7 +220,8 @@ export default function AdminSidebar({
           padding-bottom: 0.75rem;
           border-bottom: 1px solid #e5e7eb;
           gap: 0.5rem;
-          transition: padding-bottom 0.3s ease;
+          transition: all 300ms ease-in-out;
+          flex-shrink: 0;
         }
 
         .admin-sidebar-wrapper[data-collapsed="true"] .admin-sidebar-header {
@@ -226,17 +230,32 @@ export default function AdminSidebar({
         }
 
         .admin-sidebar-title {
-          transition: opacity 0.3s ease;
+          font-size: 1.125rem;
+          font-weight: 600;
+          color: #111827;
+          margin: 0;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          transition: opacity 300ms ease-in-out;
+        }
+
+        .admin-sidebar-wrapper[data-collapsed="true"] .admin-sidebar-title {
+          opacity: 0;
+          width: 0;
+          visibility: hidden;
         }
 
         .admin-sidebar-header-actions {
           display: flex;
           align-items: center;
           gap: 0.25rem;
+          flex-shrink: 0;
         }
 
         .admin-sidebar-toggle-btn {
-          transition: transform 0.3s ease;
+          transition: transform 300ms ease-in-out;
+          flex-shrink: 0;
         }
 
         .admin-sidebar-content {
@@ -245,11 +264,14 @@ export default function AdminSidebar({
           gap: 0.75rem;
           flex: 1;
           overflow-y: auto;
-          transition: opacity 0.3s ease;
+          transition: opacity 300ms ease-in-out;
+          min-height: 0;
         }
 
-        .admin-sidebar-content.hidden {
-          display: none;
+        .admin-sidebar-wrapper[data-collapsed="true"] .admin-sidebar-content {
+          opacity: 0;
+          visibility: hidden;
+          overflow: hidden;
         }
 
         .admin-sidebar-trigger {
@@ -259,21 +281,32 @@ export default function AdminSidebar({
           width: 100%;
           padding: 0.5rem 0;
           cursor: pointer;
-          transition: background-color 0.2s;
+          transition: background-color 200ms ease;
+          border-radius: 0.375rem;
+          gap: 0.5rem;
         }
 
         .admin-sidebar-trigger:hover {
           background-color: #f3f4f6;
-          border-radius: 0.375rem;
           padding-left: 0.25rem;
           padding-right: 0.25rem;
+        }
+
+        .admin-sidebar-section-title {
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: #111827;
+          margin: 0;
+          flex: 1;
+          text-align: left;
         }
 
         .admin-sidebar-trigger-icon {
           width: 1rem;
           height: 1rem;
-          transition: transform 0.3s ease;
+          transition: transform 300ms ease-in-out;
           color: #6b7280;
+          flex-shrink: 0;
         }
 
         .admin-sidebar-content-inner {
@@ -284,11 +317,34 @@ export default function AdminSidebar({
           padding: 0.75rem;
           background-color: #f9fafb;
           border-radius: 0.375rem;
+          animation: slideDown 300ms ease-in-out;
+        }
+
+        .admin-sidebar-charts-container {
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .admin-sidebar-chart {
+          width: 100%;
+          border-radius: 0.5rem;
+          border: 1px solid #e5e7eb;
+          padding: 0.75rem;
+          background-color: white;
+        }
+
+        .admin-sidebar-activity {
+          width: 100%;
+          border-radius: 0.5rem;
+          border: 1px solid #e5e7eb;
+          background-color: white;
+          overflow: hidden;
         }
 
         /* Scrollbar styling */
         .admin-sidebar-content::-webkit-scrollbar {
-          width: 4px;
+          width: 6px;
         }
 
         .admin-sidebar-content::-webkit-scrollbar-track {
@@ -297,15 +353,20 @@ export default function AdminSidebar({
 
         .admin-sidebar-content::-webkit-scrollbar-thumb {
           background-color: #cbd5e1;
-          border-radius: 2px;
+          border-radius: 3px;
         }
 
-        /* Chart container styles */
+        .admin-sidebar-content::-webkit-scrollbar-thumb:hover {
+          background-color: #94a3b8;
+        }
+
+        /* Chart container styles - Global scope */
         :global(.role-distribution-chart-container),
         :global(.user-growth-chart-container) {
           display: flex;
           flex-direction: column;
           gap: 0.5rem;
+          width: 100%;
         }
 
         :global(.role-distribution-chart-title),
@@ -320,6 +381,31 @@ export default function AdminSidebar({
         :global(.user-growth-chart-body) {
           width: 100%;
           height: auto;
+        }
+
+        /* Animation */
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            max-height: 0;
+          }
+          to {
+            opacity: 1;
+            max-height: 100%;
+          }
+        }
+
+        /* Reduce motion preference */
+        @media (prefers-reduced-motion: reduce) {
+          .admin-sidebar-wrapper,
+          .admin-sidebar-header,
+          .admin-sidebar-title,
+          .admin-sidebar-toggle-btn,
+          .admin-sidebar-content,
+          .admin-sidebar-trigger,
+          .admin-sidebar-content-inner {
+            transition: none;
+          }
         }
       `}</style>
     </div>
