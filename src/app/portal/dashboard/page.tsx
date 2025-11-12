@@ -187,6 +187,9 @@ export default function DashboardPage() {
           </Card>
         )}
 
+        {/* Features Hub - Full Width */}
+        <FeaturesHub entityId={primaryEntity?.id} />
+
         {/* Grid Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column: Widgets */}
