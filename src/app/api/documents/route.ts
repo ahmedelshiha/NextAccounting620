@@ -1,8 +1,7 @@
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 import { NextRequest, NextResponse } from 'next/server'
+import { withTenantContext } from '@/lib/api-wrapper'
+import { requireTenantContext } from '@/lib/tenant-utils'
 import { prisma } from '@/lib/prisma'
-import { getTenantFromRequest } from '@/lib/tenant'
 import { logAuditSafe } from '@/lib/observability-helpers'
 import { z } from 'zod'
 
@@ -20,15 +19,14 @@ const DocumentFilterSchema = z.object({
 
 type DocumentFilter = z.infer<typeof DocumentFilterSchema>
 
-export async function GET(request: NextRequest) {
+async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    const { userId, tenantId } = requireTenantContext()
 
-    if (!session?.user?.id) {
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const tenantId = await getTenantFromRequest(request)
     if (!tenantId) {
       return NextResponse.json({ error: 'Tenant context required' }, { status: 400 })
     }
@@ -181,6 +179,8 @@ export async function GET(request: NextRequest) {
     )
   }
 }
+
+export default withTenantContext(GET, { requireAuth: true })
 
 /**
  * Extract category from storage key path
