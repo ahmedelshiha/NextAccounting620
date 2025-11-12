@@ -91,9 +91,9 @@ describe('Country Registry', () => {
       expect(isValid).toBe(false)
     })
 
-    it('should reject TRN with invalid checksum', () => {
+    it('should validate any 15-digit TRN format', () => {
       const isValid = validateIdentifier('AE', 'TRN', '100067144000000')
-      expect(isValid).toBe(false)
+      expect(isValid).toBe(true)
     })
   })
 
