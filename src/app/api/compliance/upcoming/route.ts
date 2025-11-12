@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withTenantContext } from "@/lib/api-wrapper";
 import { requireTenantContext } from "@/lib/tenant-utils";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 
 /**

@@ -3,7 +3,7 @@ import { withTenantContext } from "@/lib/api-wrapper";
 import { requireTenantContext } from "@/lib/tenant-utils";
 import { entityService } from "@/services/entities";
 import { logger } from "@/lib/logger";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 import { z } from "zod";
 import crypto from "crypto";
 
