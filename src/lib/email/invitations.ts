@@ -1,4 +1,4 @@
-import { sendEmail } from './sendgrid';
+import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
 
 export interface SendInvitationEmailParams {
