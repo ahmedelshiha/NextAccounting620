@@ -345,6 +345,8 @@ model Tenant {
   knowledgeBaseCategories KnowledgeBaseCategory[]   @relation("KnowledgeBaseCategories")
   knowledgeBaseArticles KnowledgeBaseArticle[]      @relation("KnowledgeBaseArticles")
   userPaymentMethods    UserPaymentMethod[]        @relation("UserPaymentMethods")
+  bankingConnections    BankingConnection[]        @relation("BankingConnections")
+  bankingTransactions   BankingTransaction[]       @relation("BankingTransactions")
 
   @@index([status])
 }
