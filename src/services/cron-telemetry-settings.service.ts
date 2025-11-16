@@ -1,4 +1,5 @@
 import prisma from '@/lib/prisma'
+import { logger } from '@/lib/logger'
 import { CronTelemetrySettings, CronTelemetrySettingsSchema } from '@/schemas/settings/cron-telemetry'
 
 export async function getCronTelemetrySettings(tenantId: string): Promise<CronTelemetrySettings> {
@@ -22,7 +23,7 @@ export async function getCronTelemetrySettings(tenantId: string): Promise<CronTe
     const parsed = CronTelemetrySettingsSchema.safeParse(data)
     return parsed.success ? parsed.data : getDefaultSettings()
   } catch (error) {
-    console.error('Error loading cron telemetry settings:', error)
+    logger.error('Error loading cron telemetry settings', {}, error instanceof Error ? error : new Error(String(error)))
     return getDefaultSettings()
   }
 }
@@ -70,7 +71,7 @@ export async function updateCronTelemetrySettings(
 
     return parsed.data
   } catch (error) {
-    console.error('Error updating cron telemetry settings:', error)
+    logger.error('Error updating cron telemetry settings', {}, error instanceof Error ? error : new Error(String(error)))
     throw error
   }
 }

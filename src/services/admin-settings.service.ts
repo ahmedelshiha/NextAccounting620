@@ -1,5 +1,7 @@
 import prisma from '@/lib/prisma'
 
+import { logger } from '@/lib/logger'
+
 export interface AdminSettings {
   tenantId: string
   auditRetentionDays: number
@@ -39,7 +41,7 @@ export class AdminSettingsService {
 
       return settings
     } catch (error) {
-      console.error('Error fetching settings:', error)
+      logger.error('Error fetching settings', { tenantId }, error instanceof Error ? error : new Error(String(error)))
       return this.getDefaultSettings(tenantId)
     }
   }
@@ -67,7 +69,7 @@ export class AdminSettingsService {
 
       return updatedSettings
     } catch (error) {
-      console.error('Error updating settings:', error)
+      logger.error('Error updating settings', { tenantId }, error instanceof Error ? error : new Error(String(error)))
       throw error
     }
   }

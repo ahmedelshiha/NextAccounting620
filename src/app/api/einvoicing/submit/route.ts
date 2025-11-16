@@ -4,6 +4,7 @@ import { InvoiceStatus } from '@prisma/client'
 import { logAuditSafe } from '@/lib/observability-helpers'
 import { withTenantContext } from '@/lib/api-wrapper'
 import { requireTenantContext } from '@/lib/tenant-utils'
+import { logger } from '@/lib/logger'
 import { z } from 'zod'
 import { ZATCAAdapter } from '@/lib/einvoicing/zatca-adapter'
 import { ETAAdapter } from '@/lib/einvoicing/eta-adapter'
@@ -15,6 +16,8 @@ const SubmitEInvoiceSchema = z.object({
 })
 
 export const POST = withTenantContext(async (request: NextRequest) => {
+  let validated: z.infer<typeof SubmitEInvoiceSchema> | null = null
+
   try {
     const ctx = requireTenantContext()
 
@@ -28,7 +31,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
     }
 
     const body = await request.json()
-    const validated = SubmitEInvoiceSchema.parse(body)
+    validated = SubmitEInvoiceSchema.parse(body)
 
     // Get invoice with items and client
     const invoice = await prisma.invoice.findFirst({
@@ -153,14 +156,6 @@ export const POST = withTenantContext(async (request: NextRequest) => {
         where: { id: validated.invoiceId },
         data: {
           status: 'SUBMITTED' as InvoiceStatus,
-          // metadata update temporarily removed to fix build error
-          // metadata: JSON.stringify({
-          //   ...invoice.metadata,
-          //   einvoicingStatus: 'SUBMITTED',
-          //   einvoicingReference: submitResult.referenceNumber || submitResult.etaUuid,
-          //   einvoicingSubmittedAt: new Date().toISOString(),
-          //   country: validated.country,
-          // }),
         },
       })
     }
@@ -196,7 +191,7 @@ export const POST = withTenantContext(async (request: NextRequest) => {
       )
     }
 
-    console.error('E-invoicing submission error:', error)
+    logger.error('E-invoicing submission error', { invoiceId: validated?.invoiceId }, error instanceof Error ? error : new Error(String(error)))
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 })

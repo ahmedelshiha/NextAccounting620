@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client'
 import { queryTenantRaw } from '@/lib/db-raw';
 import { withTenantRLS } from '@/lib/prisma-rls';
 import { resolveTenantId } from './tenant-utils'
+import { logger } from '@/lib/logger'
 
 import type { Service as ServiceType, ServiceFormData, ServiceFilters, ServiceStats, ServiceAnalytics, BulkAction } from '@/types/services';
 import { validateSlugUniqueness, generateSlug, sanitizeServiceData } from '@/lib/services/utils';
@@ -380,8 +381,7 @@ export class ServicesService {
 
     const prisma = await this.resolvePrisma();
     try {
-      try { console.log('[services] createService tId ->', tId) } catch {}
-      try { console.log('[services] createService payload ->', JSON.stringify(createData)) } catch {}
+      logger.debug('createService: starting', { tenantId: tId })
       let s: any = null
       try {
         if (prisma && prisma.service && typeof prisma.service.create === 'function') {
@@ -392,7 +392,7 @@ export class ServicesService {
         }
       } catch (e) {
         // swallow and fallback
-        try { console.warn('[services] prisma.service.create threw', String(e)) } catch {}
+        logger.debug('createService: prisma.service.create error', { tenantId: tId }, e instanceof Error ? e : undefined)
       }
 
       // Fallback: construct created object if prisma returned nothing (robust for mocked environments)
@@ -424,7 +424,7 @@ export class ServicesService {
       try { serviceEvents.emit('service:created', { tenantId: tId, service: { id: s.id, slug: s.slug, name: s.name } }) } catch {}
       return this.toType(s as any);
     } catch (e: any) {
-      console.error('services POST error', e)
+      logger.error('services POST error', { tenantId: tId }, e instanceof Error ? e : new Error(String(e)))
       throw e
     }
   }

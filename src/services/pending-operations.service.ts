@@ -71,14 +71,11 @@ export async function fetchPendingOperations(
       actions: op.actions
     }))
   } catch (error) {
-    console.warn('Failed to fetch pending operations from API:', error)
     // Only use mock data as fallback in development
     if (process.env.NODE_ENV === 'development') {
-      console.info('Using mock pending operations (development fallback)')
       return getMockPendingOperations()
     }
-    // In production, log the error and return empty array
-    console.error('Pending operations API unavailable in production')
+    // In production, return empty array
     return []
   }
 }
@@ -115,7 +112,6 @@ export async function fetchOperationsMetrics(
       dueThisWeek: dueOps.length
     }
   } catch (error) {
-    console.warn('Failed to calculate operations metrics:', error)
     // Return computed metrics as fallback
     return getMockMetrics(userCount)
   }

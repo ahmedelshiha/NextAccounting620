@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { withTenantContext } from '@/lib/api-wrapper'
+import { logger } from '@/lib/logger'
 
 /**
  * Stripe Webhook Handler with Enhanced Security and Idempotency
@@ -17,14 +18,14 @@ const _api_POST = async (request: NextRequest) => {
   
   // Environment validation
   if (!STRIPE_WEBHOOK_SECRET || !STRIPE_SECRET_KEY) {
-    console.error('Stripe webhook: Missing required environment variables')
+    logger.error('Stripe webhook: Missing required environment variables')
     return NextResponse.json({ error: 'Payment gateway not configured' }, { status: 501 })
   }
 
   // Signature validation
   const sig = request.headers.get('stripe-signature')
   if (!sig) {
-    console.error('Stripe webhook: Missing stripe-signature header')
+    logger.error('Stripe webhook: Missing stripe-signature header')
     return NextResponse.json({ error: 'Missing signature' }, { status: 400 })
   }
 
@@ -42,8 +43,8 @@ const _api_POST = async (request: NextRequest) => {
     // This will throw if signature is invalid
     event = stripe.webhooks.constructEvent(rawBody, sig, STRIPE_WEBHOOK_SECRET)
   } catch (err: any) {
-    console.error('Stripe webhook signature verification failed:', err.message)
-    return NextResponse.json({ 
+    logger.error('Stripe webhook signature verification failed', { message: err?.message }, err instanceof Error ? err : new Error(String(err)))
+    return NextResponse.json({
       error: 'Invalid signature',
       message: 'Webhook signature verification failed'
     }, { status: 400 })

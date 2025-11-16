@@ -1,5 +1,5 @@
 import prisma from '@/lib/prisma'
-
+import { logger } from '@/lib/logger'
 import { DateTime } from 'luxon'
 
 export type ISO = string
@@ -207,14 +207,14 @@ export async function getAvailabilityForService(params: {
     return { slots: [] as AvailabilitySlot[] }
   }
   let svc = await serviceModel.findUnique({ where: { id: serviceId } })
-  console.log('[getAvailabilityForService] got service', !!svc)
+  logger.debug('getAvailabilityForService: got service', { serviceId, found: !!svc })
   if (!svc) {
     try {
       const seeded = (globalThis as any).__seededServices?.[serviceId]
       if (seeded) {
         // use the seeded service when prisma mock instances differ across modules in tests
          
-        console.warn('[getAvailabilityForService] using seeded service fallback for', serviceId)
+        logger.debug('getAvailabilityForService: using seeded service fallback', { serviceId })
         svc = seeded
       }
     } catch {}
@@ -230,18 +230,17 @@ export async function getAvailabilityForService(params: {
   let member: { id: string; workingHours?: any; bookingBuffer?: number; maxConcurrentBookings?: number; isAvailable?: boolean; timeZone?: string | null } | null = null
   if (teamMemberId) {
     try {
-      console.log('[getAvailabilityForService] fetching teamMember', teamMemberId)
       member = await prisma.teamMember.findUnique({ where: { id: teamMemberId }, select: { id: true, workingHours: true, bookingBuffer: true, maxConcurrentBookings: true, isAvailable: true, timeZone: true } })
-      console.log('[getAvailabilityForService] got teamMember', !!member)
+      logger.debug('getAvailabilityForService: got teamMember', { teamMemberId, found: !!member })
     } catch (err) {
-      console.error('[getAvailabilityForService] teamMember error', err)
+      logger.debug('getAvailabilityForService: teamMember fetch error', { teamMemberId }, err instanceof Error ? err : undefined)
       member = null
     }
   }
 
   // If the member exists but is not available, return empty
   if (member && member.isAvailable === false) {
-    console.log('[getAvailabilityForService] member not available')
+    logger.debug('getAvailabilityForService: member not available', { teamMemberId })
     return { slots: [] as AvailabilitySlot[] }
   }
 
@@ -256,16 +255,15 @@ export async function getAvailabilityForService(params: {
       businessHours = normalizeBusinessHours(member.workingHours as any)
     }
   } catch (e) {
-    console.error('[getAvailabilityForService] normalize member workingHours error', e)
+    logger.debug('getAvailabilityForService: normalize member workingHours error', { teamMemberId }, e instanceof Error ? e : undefined)
     businessHours = undefined
   }
   if (!businessHours) {
     businessHours = normalizeBusinessHours(svc.businessHours as any)
   }
-  console.log('[getAvailabilityForService] businessHours present?', !!businessHours, 'bookingBuffer', bookingBufferMinutes, 'maxDaily', maxDailyBookings)
+  logger.debug('getAvailabilityForService: configuration', { hasBusinessHours: !!businessHours, bookingBufferMinutes, maxDailyBookings })
 
   // Fetch busy bookings for the given window. If a team member is specified, filter to that member.
-  console.log('[getAvailabilityForService] fetching bookings window', from.toISOString(), to.toISOString())
   const busyBookings = await prisma.booking.findMany({
     where: {
       serviceId,
@@ -275,7 +273,7 @@ export async function getAvailabilityForService(params: {
     },
     select: { scheduledAt: true, duration: true },
   })
-  console.log('[getAvailabilityForService] bookings fetched', (busyBookings || []).length)
+  logger.debug('getAvailabilityForService: bookings fetched', { serviceId, teamMemberId, bookingCount: (busyBookings || []).length })
 
   const busy: BusyInterval[] = busyBookings.map((b) => {
     const start = new Date(b.scheduledAt)
