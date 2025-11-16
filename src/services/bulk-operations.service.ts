@@ -14,6 +14,7 @@
  */
 
 import prisma from '@/lib/prisma'
+import { logger } from '@/lib/logger'
 
 export type BulkOperationType = 'ROLE_CHANGE' | 'STATUS_UPDATE' | 'PERMISSION_GRANT' | 'PERMISSION_REVOKE' | 'SEND_EMAIL' | 'IMPORT_CSV' | 'CUSTOM'
 export type BulkOperationStatus = 'DRAFT' | 'READY' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED' | 'CANCELLED' | 'PAUSED'
@@ -118,7 +119,7 @@ export class BulkOperationsService {
 
       return operation
     } catch (error) {
-      console.error('Failed to create bulk operation:', error)
+      logger.error('Failed to create bulk operation', {}, error instanceof Error ? error : new Error(String(error)))
       throw error
     }
   }
@@ -142,7 +143,7 @@ export class BulkOperationsService {
         }
       })
     } catch (error) {
-      console.error('Failed to get bulk operation:', error)
+      logger.error('Failed to get bulk operation', {}, error instanceof Error ? error : new Error(String(error)))
       return null
     }
   }
@@ -175,7 +176,7 @@ export class BulkOperationsService {
 
       return { operations, total, limit, offset }
     } catch (error) {
-      console.error('Failed to list bulk operations:', error)
+      logger.error('Failed to list bulk operations', {}, error instanceof Error ? error : new Error(String(error)))
       return { operations: [], total: 0, limit: 0, offset: 0 }
     }
   }
@@ -284,7 +285,7 @@ export class BulkOperationsService {
             failureCount++
           }
         } catch (error) {
-          console.error(`Failed to process user ${user.id}:`, error)
+          logger.error('Failed to process user in bulk operation', { userId: user.id }, error instanceof Error ? error : new Error(String(error)))
           failureCount++
 
           // Record failure
@@ -331,7 +332,7 @@ export class BulkOperationsService {
         currentStepIndex: 5
       }
     } catch (error) {
-      console.error('Failed to execute bulk operation:', error)
+      logger.error('Failed to execute bulk operation', {}, error instanceof Error ? error : new Error(String(error)))
       throw error
     }
   }
@@ -388,7 +389,7 @@ export class BulkOperationsService {
 
       return operation
     } catch (error) {
-      console.error('Failed to approve bulk operation:', error)
+      logger.error('Failed to approve bulk operation', {}, error instanceof Error ? error : new Error(String(error)))
       throw error
     }
   }
@@ -419,7 +420,7 @@ export class BulkOperationsService {
 
       return operation
     } catch (error) {
-      console.error('Failed to reject bulk operation:', error)
+      logger.error('Failed to reject bulk operation', {}, error instanceof Error ? error : new Error(String(error)))
       throw error
     }
   }
@@ -442,7 +443,7 @@ export class BulkOperationsService {
 
       return operation
     } catch (error) {
-      console.error('Failed to cancel bulk operation:', error)
+      logger.error('Failed to cancel bulk operation', {}, error instanceof Error ? error : new Error(String(error)))
       throw error
     }
   }
@@ -492,7 +493,7 @@ export class BulkOperationsService {
 
       return true
     } catch (error) {
-      console.error('Failed to rollback bulk operation:', error)
+      logger.error('Failed to rollback bulk operation', {}, error instanceof Error ? error : new Error(String(error)))
       throw error
     }
   }
@@ -527,7 +528,7 @@ export class BulkOperationsService {
         select: { id: true, name: true, email: true, role: true }
       })
     } catch (error) {
-      console.error('Failed to filter users:', error)
+      logger.error('Failed to filter users', {}, error instanceof Error ? error : new Error(String(error)))
       return []
     }
   }
@@ -678,7 +679,7 @@ export class BulkOperationsService {
         })
       }
     } catch (error) {
-      console.error(`Failed to restore state for user ${userId}:`, error)
+      logger.error('Failed to restore state for user', { userId }, error instanceof Error ? error : new Error(String(error)))
     }
   }
 
@@ -703,7 +704,7 @@ export class BulkOperationsService {
         }
       })
     } catch (error) {
-      console.error('Failed to create history entry:', error)
+      logger.error('Failed to create history entry', {}, error instanceof Error ? error : new Error(String(error)))
     }
   }
 }

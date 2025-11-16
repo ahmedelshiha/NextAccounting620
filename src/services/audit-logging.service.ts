@@ -1,4 +1,5 @@
 import prisma from '@/lib/prisma'
+import { logger } from '@/lib/logger'
 
 /**
  * Audit log action types
@@ -118,7 +119,7 @@ export class AuditLoggingService {
         },
       })
     } catch (error) {
-      console.error('Failed to log audit event:', error)
+      logger.error('Failed to log audit event', {}, error instanceof Error ? error : new Error(String(error)))
       // Don't throw - audit logging failure shouldn't break the application
     }
   }
